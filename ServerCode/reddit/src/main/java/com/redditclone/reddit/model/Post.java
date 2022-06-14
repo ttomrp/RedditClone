@@ -19,6 +19,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+// getters and setters will be generated at compile time from Lombok
+
 @Data
 @Entity
 @Builder
