@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.redditclone.reddit.dto.RegisterRequest;
+import com.redditclone.reddit.model.NotificationEmail;
 import com.redditclone.reddit.model.User;
 import com.redditclone.reddit.model.VerificationToken;
 import com.redditclone.reddit.repository.UserRepository;
@@ -24,6 +25,8 @@ public class AuthService {
     private final UserRepository userRepository;
     private final VerificationTokenRepository verificationTokenRepository;
 
+    private final MailService mailService;
+
     @Transactional
     public void signup(RegisterRequest registerRequest) {
         User user = new User();
@@ -35,6 +38,12 @@ public class AuthService {
         userRepository.save(user);
 
         String token = generateVerificationToken(user);
+
+        mailService.sendMail(new NotificationEmail(
+                "Please activate your account",
+                user.getEmail(),
+                "Please click the below URL to activate your account: " +
+                        "http://localhost:8080/api/auth/accountVerification/" + token));
     }
 
     private String generateVerificationToken(User user) {
