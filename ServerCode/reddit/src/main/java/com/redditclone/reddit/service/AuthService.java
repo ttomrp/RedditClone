@@ -1,5 +1,7 @@
 package com.redditclone.reddit.service;
 
+import java.util.UUID;
+
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,7 +10,9 @@ import org.springframework.stereotype.Service;
 
 import com.redditclone.reddit.dto.RegisterRequest;
 import com.redditclone.reddit.model.User;
+import com.redditclone.reddit.model.VerificationToken;
 import com.redditclone.reddit.repository.UserRepository;
+import com.redditclone.reddit.repository.VerificationTokenRepository;
 
 import lombok.AllArgsConstructor;
 
@@ -17,8 +21,8 @@ import lombok.AllArgsConstructor;
 public class AuthService {
 
     private final PasswordEncoder passwordEncoder;
-
     private final UserRepository userRepository;
+    private final VerificationTokenRepository verificationTokenRepository;
 
     @Transactional
     public void signup(RegisterRequest registerRequest) {
@@ -29,5 +33,17 @@ public class AuthService {
         user.setEnabled(false);
 
         userRepository.save(user);
+
+        String token = generateVerificationToken(user);
+    }
+
+    private String generateVerificationToken(User user) {
+        String token = UUID.randomUUID().toString();
+        VerificationToken verificationToken = new VerificationToken();
+        verificationToken.setToken(token);
+        verificationToken.setUser(user);
+
+        verificationTokenRepository.save(verificationToken);
+        return token;
     }
 }
