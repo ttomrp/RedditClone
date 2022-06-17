@@ -6,7 +6,8 @@ Back-end:
 2. Spring Boot
 3. Spring Security
 4. Spring Data JPA
-5. PostgreSQL 14
+5. JSON Web Tokens (JWT)
+6. PostgreSQL 14
 
 Front-end:
 
