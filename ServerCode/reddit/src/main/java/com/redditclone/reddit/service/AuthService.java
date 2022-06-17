@@ -6,9 +6,12 @@ import java.util.UUID;
 
 import javax.transaction.Transactional;
 
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.redditclone.reddit.dto.LoginRequest;
 import com.redditclone.reddit.dto.RegisterRequest;
 import com.redditclone.reddit.exceptions.SpringRedditException;
 import com.redditclone.reddit.model.NotificationEmail;
@@ -27,8 +30,9 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final VerificationTokenRepository verificationTokenRepository;
-
     private final MailService mailService;
+
+    private final AuthenticationManager authenticationManager;
 
     /*
      * POST
@@ -88,5 +92,13 @@ public class AuthService {
                 .orElseThrow(() -> new SpringRedditException("User not found with name: " + username));
         user.setEnabled(true);
         userRepository.save(user);
+    }
+
+    /*
+     * POST
+     */
+    public void login(LoginRequest loginRequest) {
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
     }
 }
