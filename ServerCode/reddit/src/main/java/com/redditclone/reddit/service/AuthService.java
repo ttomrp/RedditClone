@@ -1,5 +1,6 @@
 package com.redditclone.reddit.service;
 
+import java.time.Instant;
 import java.util.UUID;
 
 import javax.transaction.Transactional;
@@ -19,6 +20,7 @@ import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
+@Transactional
 public class AuthService {
 
     private final PasswordEncoder passwordEncoder;
@@ -27,6 +29,13 @@ public class AuthService {
 
     private final MailService mailService;
 
+    /*
+     * POST
+     * 
+     * When a post request is made, a RegisterRequest object is generated and
+     * the AuthController sends it here where a new User object is created
+     * from the request.
+     */
     @Transactional
     public void signup(RegisterRequest registerRequest) {
         User user = new User();
@@ -34,6 +43,7 @@ public class AuthService {
         user.setEmail(registerRequest.getEmail());
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         user.setEnabled(false);
+        user.setCreated(Instant.now());
 
         userRepository.save(user);
 
@@ -46,6 +56,9 @@ public class AuthService {
                         "http://localhost:8080/api/auth/accountVerification/" + token));
     }
 
+    /*
+     * Helper method
+     */
     private String generateVerificationToken(User user) {
         String token = UUID.randomUUID().toString();
         VerificationToken verificationToken = new VerificationToken();
